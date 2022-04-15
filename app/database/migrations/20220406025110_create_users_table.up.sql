@@ -1,4 +1,4 @@
-CREATE FUNCTION set_update_time()
+CREATE FUNCTION set_users_update_time()
 RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = NOW(); RETURN NEW; END; $$ LANGUAGE plpgsql;
 
 CREATE TABLE users
@@ -14,4 +14,4 @@ CREATE TABLE users
     PRIMARY KEY (id)
 );
 
-CREATE TRIGGER update_tri BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE set_update_time();
+CREATE TRIGGER users_update_tri BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE set_users_update_time();
