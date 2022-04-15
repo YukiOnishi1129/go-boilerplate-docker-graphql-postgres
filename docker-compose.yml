@@ -18,31 +18,26 @@ services:
     security_opt:
       - seccomp:unconfined
     environment:
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - "TZ=Asia/Tokyo" # タイムゾーンを日本時刻に設定
 
   db:
-    container_name: ${MYSQL_HOST}
+    container_name: ${POSTGRES_HOST}
     environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - "TZ=Asia/Tokyo" # タイムゾーンを日本時刻に設定
-    image: mysql:8.0
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    image: postgres:14.2
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
-      - ./mysql/db:/docker-entrypoint-initdb.d  #初期データ
+      - postgres-data:/var/lib/postgresql/data:delegated
+      - ./postgres/db:/docker-entrypoint-initdb.d  #初期データ
     ports:
-      - ${MYSQL_PORT}:3306
+      - "5432:5432"
 
 volumes:
-  mysql_data:
-  mysql_data_test:
+  postgres-data:
