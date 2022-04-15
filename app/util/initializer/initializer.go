@@ -3,7 +3,6 @@ package initializer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/YukiOnishi1129/go-boilerplate-docker-graphql-postgres/app/database"
@@ -14,15 +13,10 @@ import (
 	awsutil "github.com/YukiOnishi1129/go-boilerplate-docker-graphql-postgres/app/util/aws"
 	"github.com/YukiOnishi1129/go-boilerplate-docker-graphql-postgres/app/util/view"
 	"github.com/go-chi/chi"
-	"github.com/joho/godotenv"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 func Init(router *chi.Mux) (*handler.Server, error) {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Printf("読み込み出来ませんでした: %v", err)
-	}
 	db, dbErr := database.Init()
 	if dbErr != nil {
 		return nil, dbErr
