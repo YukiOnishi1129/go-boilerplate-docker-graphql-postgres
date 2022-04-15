@@ -1,0 +1,42 @@
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    imageUrl: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    deletedAt: DateTime
+}
+
+input SignInInput {
+    email: String!
+    password: String!
+}
+
+input SignUpInput {
+    name: String!
+    email: String!
+    password: String!
+    passwordConfirm: String!
+}
+
+input updatePasswordInput {
+    oldPassword: String!
+    newPassword: String!
+    newPasswordConfirm: String!
+}
+
+extend type Query {
+    myUserDetail: User!
+    userDetail(id: ID!): User!
+}
+
+extend type Mutation {
+    signIn(input: SignInInput!): User!
+    signUp(input: SignUpInput!): User!
+    signOut: String!
+    updateUserName(name: String!): User!
+    updateUserEmail(email: String!): User!
+    updateUserPassword(input: updatePasswordInput!): User!
+    uploadUserFile(file:Upload): User!
+}

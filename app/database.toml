@@ -1,0 +1,11 @@
+[mysql]
+dbname     = "GO_POSTGRES_GRAPHQL_DB"
+host       = "127.0.0.1"
+port       = 3306
+user       = "user"
+pass       = "pass"
+sslmode    = "false"
+whitelist = [
+    "todos",
+    "users"
+]
