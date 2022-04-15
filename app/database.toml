@@ -1,10 +1,10 @@
-[mysql]
+[psql]
 dbname     = "GO_POSTGRES_GRAPHQL_DB"
-host       = "127.0.0.1"
-port       = 3306
+host       = "localhost"
+port       = 5432
 user       = "user"
 pass       = "pass"
-sslmode    = "false"
+sslmode    = "disable"
 whitelist = [
     "todos",
     "users"

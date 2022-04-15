@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS todos_update_tri ON todos;

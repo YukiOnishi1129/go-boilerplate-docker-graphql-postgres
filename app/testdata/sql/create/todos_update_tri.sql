@@ -1,0 +1,1 @@
+CREATE TRIGGER todos_update_tri BEFORE UPDATE ON todos FOR EACH ROW EXECUTE PROCEDURE set_todos_update_time();

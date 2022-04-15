@@ -11,12 +11,12 @@ case ${1} in
 # テーブルからentityを自動生成 (事前にdbコンテナを立ち上げておくこと)
 "entity:create")
  echo  === entity create start ===
- sqlboiler mysql -c app/database.toml -o app/database/entity -p entity --no-tests --wipe
+ sqlboiler psql -c app/database.toml -o app/database/entity -p entity --no-tests --wipe
  echo  === entity create end ===
  ;;
 "db:migrate")
  echo  === db migrate start ===
- migrate -source file://app/database/migrations -database 'mysql://user:pass@tcp(127.0.0.1:3306)/GO_POSTGRES_GRAPHQL_DB' up
+ migrate -source file://app/database/migrations -database 'postgres://user:pass@localhost:5432/GO_POSTGRES_GRAPHQL_DB?sslmode=disable' up
  echo  === db migrate end ===
  ;;
 "db:seed")
@@ -28,17 +28,17 @@ case ${1} in
  ;;
 "db:rollback")
  echo  === db rollback start ===
- migrate -source file://app/database/migrations -database 'mysql://user:pass@tcp(127.0.0.1:3306)/GO_POSTGRES_GRAPHQL_DB' down
+ migrate -source file://app/database/migrations -database 'postgres://user:pass@localhost:5432/GO_POSTGRES_GRAPHQL_DB?sslmode=disable' down
  echo  === db rollback end ===
  ;;
 "db:reset")
  # db:rollback
  echo  === db rollback start ===
- migrate -source file://app/database/migrations -database 'mysql://user:pass@tcp(127.0.0.1:3306)/GO_POSTGRES_GRAPHQL_DB' down
+ migrate -source file://app/database/migrations -database 'postgres://user:pass@localhost:5432/GO_POSTGRES_GRAPHQL_DB?sslmode=disable' down
  echo  === db rollback end ===
  # db:migrate
  echo  === db migrate start ===
- migrate -source file://app/database/migrations -database 'mysql://user:pass@tcp(127.0.0.1:3306)/GO_POSTGRES_GRAPHQL_DB' up
+ migrate -source file://app/database/migrations -database 'postgres://user:pass@localhost:5432/GO_POSTGRES_GRAPHQL_DB?sslmode=disable' up
  echo  === db migrate end ===
  # db:seed
  echo  === db seed start ===

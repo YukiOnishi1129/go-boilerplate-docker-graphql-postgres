@@ -18,7 +18,7 @@ func TestService_TodoList_OnSuccess(t *testing.T) {
 	RunWithDB(t, "get TodoList", func(t *testing.T, db *sql.DB) {
 		//　予測値
 		wantUser := model.User{
-			ID:        strconv.FormatUint(1, 10),
+			ID:        strconv.FormatInt(1, 10),
 			Name:      "太郎",
 			Email:     "taro@gmail.com",
 			CreatedAt: TimeLayout,
@@ -26,7 +26,7 @@ func TestService_TodoList_OnSuccess(t *testing.T) {
 		}
 		want := [...]*model.Todo{
 			{
-				ID:        strconv.FormatUint(1, 10),
+				ID:        strconv.FormatInt(1, 10),
 				Title:     "todo1",
 				Comment:   "todo1のコメント",
 				User:      &wantUser,
@@ -34,7 +34,7 @@ func TestService_TodoList_OnSuccess(t *testing.T) {
 				UpdatedAt: TimeLayout,
 			},
 			{
-				ID:        strconv.FormatUint(2, 10),
+				ID:        strconv.FormatInt(2, 10),
 				Title:     "todo2",
 				Comment:   "todo2のコメント",
 				User:      &wantUser,
@@ -70,7 +70,7 @@ func TestService_TodoDetail_OnSuccess(t *testing.T) {
 	RunWithDB(t, "get TodoDetail", func(t *testing.T, db *sql.DB) {
 		//　予測値
 		wantUser := model.User{
-			ID:        strconv.FormatUint(1, 10),
+			ID:        strconv.FormatInt(1, 10),
 			Name:      "太郎",
 			Email:     "taro@gmail.com",
 			CreatedAt: TimeLayout,
@@ -78,7 +78,7 @@ func TestService_TodoDetail_OnSuccess(t *testing.T) {
 		}
 		//　予測値
 		want := model.Todo{
-			ID:        strconv.FormatUint(2, 10),
+			ID:        strconv.FormatInt(2, 10),
 			Title:     "todo2",
 			Comment:   "todo2のコメント",
 			User:      &wantUser,
@@ -133,7 +133,7 @@ func TestService_CreateTodo_OnSuccess(t *testing.T) {
 	RunWithDB(t, "create todo success", func(t *testing.T, db *sql.DB) {
 		//　予測値
 		wantUser := model.User{
-			ID:        strconv.FormatUint(1, 10),
+			ID:        strconv.FormatInt(1, 10),
 			Name:      "太郎",
 			Email:     "taro@gmail.com",
 			CreatedAt: TimeLayout,
@@ -141,7 +141,7 @@ func TestService_CreateTodo_OnSuccess(t *testing.T) {
 		}
 		// 予測値
 		want := model.Todo{
-			ID:        strconv.FormatUint(4, 10),
+			ID:        strconv.FormatInt(4, 10),
 			Title:     "todo4",
 			Comment:   "todo4のコメント",
 			User:      &wantUser,
@@ -233,14 +233,14 @@ func TestService_UpdateTodo_OnSuccess(t *testing.T) {
 
 		// 予測値
 		wantUser := model.User{
-			ID:        strconv.FormatUint(targetUser.ID, 10),
+			ID:        strconv.FormatInt(targetUser.ID, 10),
 			Name:      targetUser.Name,
 			Email:     targetUser.Email,
 			CreatedAt: TimeLayout,
 			UpdatedAt: TimeLayout,
 		}
 		want := model.Todo{
-			ID:        strconv.FormatUint(3, 10),
+			ID:        strconv.FormatInt(3, 10),
 			Title:     "todo3title",
 			Comment:   "todo3コメントupdate",
 			User:      &wantUser,

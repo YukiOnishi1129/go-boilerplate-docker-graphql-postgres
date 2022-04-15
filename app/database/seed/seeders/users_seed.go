@@ -37,7 +37,7 @@ func CreateUserData(con *sql.DB) error {
 	}
 
 	for _, insertData := range insertDataList {
-		ins, err = con.Prepare("INSERT INTO users (id, name, email, password) VALUES (?,?,?,?)")
+		ins, err = con.Prepare("INSERT INTO users (id, name, email, password) VALUES ($1,$2,$3,$4)")
 		if err != nil {
 			return err
 		}
@@ -45,6 +45,14 @@ func CreateUserData(con *sql.DB) error {
 		if err != nil {
 			return err
 		}
+	}
+	get, getErr := con.Prepare("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));")
+	if getErr != nil {
+		return getErr
+	}
+	_, err = get.Exec()
+	if err != nil {
+		return err
 	}
 	fmt.Println("create data at users table")
 	return nil

@@ -3,14 +3,14 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"os"
 )
 
 //Init DB接続処理
 func Init() (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", os.Getenv(("MYSQL_USER")), os.Getenv(("MYSQL_PASSWORD")), os.Getenv(("MYSQL_HOST")), os.Getenv(("MYSQL_PORT")), os.Getenv(("MYSQL_DATABASE")))
-	db, dbErr := sql.Open("mysql", dsn)
+	dsn := fmt.Sprintf("port=%s host=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
+	db, dbErr := sql.Open("postgres", dsn)
 	if dbErr != nil {
 		return nil, dbErr
 	}

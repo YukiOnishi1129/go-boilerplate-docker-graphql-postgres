@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/YukiOnishi1129/go-boilerplate-docker-graphql-postgres/app/testdata"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/ory/dockertest"
+	"github.com/ory/dockertest/docker"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -21,7 +22,8 @@ var (
 	connTest     *sql.DB
 )
 
-var tableSQLFileName = [...]string{"users", "todos"}
+var createTableSQLFileName = [...]string{"users_update_func", "users", "users_update_tri", "todos_update_func", "todos", "todos_update_tri"}
+var dropTableSQLFileName = [...]string{"users_update_tri", "users_update_func", "users", "todos_update_tri", "todos_update_func", "todos"}
 var unEnabledFkKeySQLFileName = "un_enabled"
 var enabledFkKeySQLFileName = "enabled"
 
@@ -48,10 +50,14 @@ func beforeAll() {
 	_, fileName, _, _ := runtime.Caller(0)
 	err = connectDB()
 	if err != nil {
+		// コンテナ停止
+		closeContainer()
 		log.Fatalf("db connect error: %v", err)
 	}
-	for _, sqlFileName := range tableSQLFileName {
+	for _, sqlFileName := range createTableSQLFileName {
 		if err = execSQLScript(fmt.Sprintf("%s/../testdata/sql/create/%s.sql", filepath.Dir(fileName), sqlFileName)); err != nil {
+			// コンテナ停止
+			closeContainer()
 			log.Fatalf("%s, %v", fileName, err)
 		}
 	}
@@ -62,20 +68,28 @@ func beforeEach() {
 	_, fileName, _, _ := runtime.Caller(0)
 	// 外部キーを無効化
 	if err = execSQLScript(fmt.Sprintf("%s/../testdata/sql/fkkey/%s.sql", filepath.Dir(fileName), unEnabledFkKeySQLFileName)); err != nil {
-		log.Fatalf("%s, %v", fileName, err)
+		// コンテナ停止
+		closeContainer()
+		log.Fatalf("unenable foreignkey error: %s, %v", fileName, err)
 	}
 	// データ削除
-	for _, sqlFileName := range tableSQLFileName {
+	for _, sqlFileName := range dropTableSQLFileName {
 		if err = execSQLScript(fmt.Sprintf("%s/../testdata/sql/truncate/%s.sql", filepath.Dir(fileName), sqlFileName)); err != nil {
-			log.Fatalf("%s, %v", fileName, err)
+			// コンテナ停止
+			closeContainer()
+			log.Fatalf("truncate table error: %s, %v", fileName, err)
 		}
 	}
 	// 外部キーを有効化
 	if err = execSQLScript(fmt.Sprintf("%s/../testdata/sql/fkkey/%s.sql", filepath.Dir(fileName), enabledFkKeySQLFileName)); err != nil {
-		log.Fatalf("%s, %v", fileName, err)
+		// コンテナ停止
+		closeContainer()
+		log.Fatalf("enable foreignkey error: %s, %v", fileName, err)
 	}
 	// テストデータ作成
 	if err = createTestData(); err != nil {
+		// コンテナ停止
+		closeContainer()
 		return
 	}
 }
@@ -89,36 +103,47 @@ func afterAll() {
 func createContainer() {
 	var err error
 	// 絶対パスを取得
-	_, fileName, _, _ := runtime.Caller(0)
+	//_, fileName, _, _ := runtime.Caller(0)
 
 	// Dockerとの接続
 	poolTest, err = dockertest.NewPool("")
 	poolTest.MaxWait = time.Minute * 2
 	if err != nil {
+		// コンテナ停止
+		closeContainer()
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
 	// Dockerコンテナ起動時の細かいオプションを指定する
 	runOptions := &dockertest.RunOptions{
-		Repository: "mysql",
-		Tag:        "8.0",
+		Repository: "postgres",
+		Tag:        "14.2",
 		Env: []string{
-			"MYSQL_ROOT_PASSWORD=secret",
+			"POSTGRES_USER=postgres",
+			"POSTGRES_PASSWORD=secret",
+			"POSTGRES_DB=GO_POSTGRES_GRAPHQL_DB",
 		},
-		Mounts: []string{
-			fmt.Sprintf("%s/../../mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf", filepath.Dir(fileName)),
-			fmt.Sprintf("%s/../../mysql/db:/docker-entrypoint-initdb.d", filepath.Dir(fileName)), // コンテナ起動時に実行するSQL
+		ExposedPorts: []string{"5432"},
+		PortBindings: map[docker.Port][]docker.PortBinding{
+			"5432": {
+				{HostIP: "0.0.0.0", HostPort: "5433"},
+			},
 		},
-		Cmd: []string{
-			"mysqld",
-			"--character-set-server=utf8mb4",
-			"--collation-server=utf8mb4_unicode_ci",
-		},
+		//Mounts: []string{
+		//	fmt.Sprintf("%s/../../postgres/db:/docker-entrypoint-initdb.d", filepath.Dir(fileName)), // コンテナ起動時に実行するSQL
+		//},
+		//Cmd: []string{
+		//	"mysqld",
+		//	"--character-set-server=utf8mb4",
+		//	"--collation-server=utf8mb4_unicode_ci",
+		//},
 	}
 
 	// コンテナを起動
 	resourceTest, err = poolTest.RunWithOptions(runOptions)
 	if err != nil {
+		// コンテナ停止
+		closeContainer()
 		log.Fatalf("Could not start resource: %s", err)
 	}
 }
@@ -138,12 +163,14 @@ func connectDB() error {
 		time.Sleep(time.Second * 20)
 
 		var err error
-		connTest, err = sql.Open("mysql", fmt.Sprintf("root:secret@(localhost:%s)/GO_POSTGRES_GRAPHQL_DB?charset=utf8mb4&parseTime=True&loc=Local", resourceTest.GetPort("3306/tcp")))
+		connTest, err = sql.Open("postgres", "postgres://postgres:secret@localhost:5433/GO_POSTGRES_GRAPHQL_DB?sslmode=disable")
 		if err != nil {
 			return err
 		}
 		return connTest.Ping()
 	}); poolErr != nil {
+		// コンテナ停止
+		closeContainer()
 		log.Fatalf("Could not connect to docker: %s", poolErr)
 		return poolErr
 	}

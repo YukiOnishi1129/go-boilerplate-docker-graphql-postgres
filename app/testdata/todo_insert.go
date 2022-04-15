@@ -34,7 +34,7 @@ func CreateTodoData(con *sql.DB) error {
 	}
 
 	for _, insertData := range insertDataList {
-		ins, err = con.Prepare("INSERT INTO todos (id, title, comment, user_id) VALUES (?,?,?,?)")
+		ins, err = con.Prepare("INSERT INTO todos (id, title, comment, user_id) VALUES ($1,$2,$3,$4)")
 		if err != nil {
 			return err
 		}
@@ -42,6 +42,14 @@ func CreateTodoData(con *sql.DB) error {
 		if err != nil {
 			return err
 		}
+	}
+	get, getErr := con.Prepare("SELECT setval('todos_id_seq', (SELECT MAX(id) FROM todos));")
+	if getErr != nil {
+		return getErr
+	}
+	_, err = get.Exec()
+	if err != nil {
+		return err
 	}
 	return nil
 }
