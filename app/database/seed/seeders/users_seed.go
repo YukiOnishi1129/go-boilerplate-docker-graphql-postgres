@@ -46,6 +46,14 @@ func CreateUserData(con *sql.DB) error {
 			return err
 		}
 	}
+	get, getErr := con.Prepare("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));")
+	if getErr != nil {
+		return getErr
+	}
+	_, err = get.Exec()
+	if err != nil {
+		return err
+	}
 	fmt.Println("create data at users table")
 	return nil
 }

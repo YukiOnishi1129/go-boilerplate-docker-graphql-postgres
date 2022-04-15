@@ -105,7 +105,7 @@ func createContainer() {
 		Repository: "postgres",
 		Tag:        "14.2",
 		Env: []string{
-			"POSTGRES_USER=user",
+			"POSTGRES_USER=postgres",
 			"POSTGRES_PASSWORD=secret",
 		},
 		ExposedPorts: []string{"5432"},
@@ -146,7 +146,7 @@ func connectDB() error {
 		time.Sleep(time.Second * 20)
 
 		var err error
-		connTest, err = sql.Open("postgres", fmt.Sprintf("postgres://user:pass@localhost:5433/GO_POSTGRES_GRAPHQL_DB?sslmode=disable"))
+		connTest, err = sql.Open("postgres", fmt.Sprintf("postgres://postgres:secret@localhost:5433/GO_POSTGRES_GRAPHQL_DB?sslmode=disable"))
 		if err != nil {
 			return err
 		}
