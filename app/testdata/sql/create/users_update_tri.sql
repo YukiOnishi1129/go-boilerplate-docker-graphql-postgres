@@ -1,0 +1,1 @@
+CREATE TRIGGER users_update_tri BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE set_users_update_time();
