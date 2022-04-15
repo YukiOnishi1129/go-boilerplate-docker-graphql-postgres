@@ -93,8 +93,11 @@ docker-compose up -d
 ```
 
 ### 4. GraphQL実行環境
-- localhost:4000でGraphiQLが立ち上がる
+- `localhost:4000`でGraphiQLが立ち上がる
   - graphqlのクエリーを実行できるようになります。
+  - ![スクリーンショット 2022-04-16 6 49 13](https://user-images.githubusercontent.com/58220747/163649363-ae18280f-cab9-42f1-91aa-6ac1637ebc44.png)
+
+  
   - クエリについては以下を参照
 - query, mutation, fragmentは以下を記載
 ```
