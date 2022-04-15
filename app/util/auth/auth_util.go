@@ -47,15 +47,15 @@ func MiddleWare(db *sql.DB) func(http.Handler) http.Handler {
 			userID, err := getUserIDFromJwt(c)
 			if err != nil {
 				next.ServeHTTP(w, r)
-				fmt.Printf("auth.middleware: %v\n", err)
+				fmt.Printf("auth.middleware get userID from cookie: %v\n", err)
 				return
 			}
 
 			// userIdよりユーザー情報を取得
-			user, userErr := entity.Users(qm.Where("id=?", userID)).One(ctx, db)
+			user, userErr := entity.Users(qm.Where("id=$1", userID)).One(ctx, db)
 			if userErr != nil {
 				next.ServeHTTP(w, r)
-				fmt.Printf("auth.middleware: %v\n", err)
+				fmt.Printf("auth.middleware get user: %v\n", userErr)
 				return
 			}
 

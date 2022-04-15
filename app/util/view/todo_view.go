@@ -9,14 +9,14 @@ import (
 
 func NewTodoFromModel(entity *entity.Todo) *model.Todo {
 	resUser := model.User{
-		ID:        strconv.FormatUint(entity.R.User.ID, 10),
+		ID:        strconv.FormatInt(entity.R.User.ID, 10),
 		Name:      entity.R.User.Name,
 		Email:     entity.R.User.Email,
 		CreatedAt: timeutil.TimeFormat(entity.R.User.CreatedAt),
 		UpdatedAt: timeutil.TimeFormat(entity.R.User.UpdatedAt),
 	}
 	resTodo := model.Todo{
-		ID:        strconv.FormatUint(entity.ID, 10),
+		ID:        strconv.FormatInt(entity.ID, 10),
 		Title:     entity.Title,
 		Comment:   entity.Comment,
 		CreatedAt: timeutil.TimeFormat(entity.CreatedAt),

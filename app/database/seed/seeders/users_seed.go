@@ -37,7 +37,7 @@ func CreateUserData(con *sql.DB) error {
 	}
 
 	for _, insertData := range insertDataList {
-		ins, err = con.Prepare("INSERT INTO users (id, name, email, password) VALUES (?,?,?,?)")
+		ins, err = con.Prepare("INSERT INTO users (id, name, email, password) VALUES ($1,$2,$3,$4)")
 		if err != nil {
 			return err
 		}

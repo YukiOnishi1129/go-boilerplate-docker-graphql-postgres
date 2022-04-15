@@ -11,7 +11,7 @@ case ${1} in
 # テーブルからentityを自動生成 (事前にdbコンテナを立ち上げておくこと)
 "entity:create")
  echo  === entity create start ===
- sqlboiler mysql -c app/database.toml -o app/database/entity -p entity --no-tests --wipe
+ sqlboiler psql -c app/database.toml -o app/database/entity -p entity --no-tests --wipe
  echo  === entity create end ===
  ;;
 "db:migrate")

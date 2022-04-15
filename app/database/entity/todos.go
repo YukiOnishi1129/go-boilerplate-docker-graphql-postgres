@@ -24,10 +24,10 @@ import (
 
 // Todo is an object representing the database table.
 type Todo struct {
-	ID        uint64    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Title     string    `boil:"title" json:"title" toml:"title" yaml:"title"`
 	Comment   string    `boil:"comment" json:"comment" toml:"comment" yaml:"comment"`
-	UserID    uint64    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	UserID    int64     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	DeletedAt null.Time `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
@@ -74,22 +74,22 @@ var TodoTableColumns = struct {
 
 // Generated where
 
-type whereHelperuint64 struct{ field string }
+type whereHelperint64 struct{ field string }
 
-func (w whereHelperuint64) EQ(x uint64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperuint64) NEQ(x uint64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperuint64) LT(x uint64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperuint64) LTE(x uint64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperuint64) GT(x uint64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperuint64) GTE(x uint64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperuint64) IN(slice []uint64) qm.QueryMod {
+func (w whereHelperint64) EQ(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint64) NEQ(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint64) LT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint64) LTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint64) GT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint64) GTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint64) IN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
 	}
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelperuint64) NIN(slice []uint64) qm.QueryMod {
+func (w whereHelperint64) NIN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
@@ -166,21 +166,21 @@ func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var TodoWhere = struct {
-	ID        whereHelperuint64
+	ID        whereHelperint64
 	Title     whereHelperstring
 	Comment   whereHelperstring
-	UserID    whereHelperuint64
+	UserID    whereHelperint64
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 	DeletedAt whereHelpernull_Time
 }{
-	ID:        whereHelperuint64{field: "`todos`.`id`"},
-	Title:     whereHelperstring{field: "`todos`.`title`"},
-	Comment:   whereHelperstring{field: "`todos`.`comment`"},
-	UserID:    whereHelperuint64{field: "`todos`.`user_id`"},
-	CreatedAt: whereHelpertime_Time{field: "`todos`.`created_at`"},
-	UpdatedAt: whereHelpertime_Time{field: "`todos`.`updated_at`"},
-	DeletedAt: whereHelpernull_Time{field: "`todos`.`deleted_at`"},
+	ID:        whereHelperint64{field: "\"todos\".\"id\""},
+	Title:     whereHelperstring{field: "\"todos\".\"title\""},
+	Comment:   whereHelperstring{field: "\"todos\".\"comment\""},
+	UserID:    whereHelperint64{field: "\"todos\".\"user_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"todos\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"todos\".\"updated_at\""},
+	DeletedAt: whereHelpernull_Time{field: "\"todos\".\"deleted_at\""},
 }
 
 // TodoRels is where relationship names are stored.
@@ -205,8 +205,8 @@ type todoL struct{}
 
 var (
 	todoAllColumns            = []string{"id", "title", "comment", "user_id", "created_at", "updated_at", "deleted_at"}
-	todoColumnsWithoutDefault = []string{"title", "comment", "user_id", "deleted_at"}
-	todoColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	todoColumnsWithoutDefault = []string{"title", "comment", "deleted_at"}
+	todoColumnsWithDefault    = []string{"id", "user_id", "created_at", "updated_at"}
 	todoPrimaryKeyColumns     = []string{"id"}
 	todoGeneratedColumns      = []string{}
 )
@@ -492,13 +492,13 @@ func (q todoQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 // User pointed to by the foreign key.
 func (o *Todo) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("`id` = ?", o.UserID),
+		qm.Where("\"id\" = ?", o.UserID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
 	query := Users(queryMods...)
-	queries.SetFrom(query.Query, "`users`")
+	queries.SetFrom(query.Query, "\"users\"")
 
 	return query
 }
@@ -619,9 +619,9 @@ func (o *Todo) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bo
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE `todos` SET %s WHERE %s",
-		strmangle.SetParamNames("`", "`", 0, []string{"user_id"}),
-		strmangle.WhereClause("`", "`", 0, todoPrimaryKeyColumns),
+		"UPDATE \"todos\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+		strmangle.WhereClause("\"", "\"", 2, todoPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
 
@@ -656,13 +656,13 @@ func (o *Todo) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bo
 
 // Todos retrieves all the records using an executor.
 func Todos(mods ...qm.QueryMod) todoQuery {
-	mods = append(mods, qm.From("`todos`"))
+	mods = append(mods, qm.From("\"todos\""))
 	return todoQuery{NewQuery(mods...)}
 }
 
 // FindTodo retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTodo(ctx context.Context, exec boil.ContextExecutor, iD uint64, selectCols ...string) (*Todo, error) {
+func FindTodo(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Todo, error) {
 	todoObj := &Todo{}
 
 	sel := "*"
@@ -670,7 +670,7 @@ func FindTodo(ctx context.Context, exec boil.ContextExecutor, iD uint64, selectC
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `todos` where `id`=?", sel,
+		"select %s from \"todos\" where \"id\"=$1", sel,
 	)
 
 	q := queries.Raw(query, iD)
@@ -737,15 +737,15 @@ func (o *Todo) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO `todos` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO \"todos\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO `todos` () VALUES ()%s%s"
+			cache.query = "INSERT INTO \"todos\" %sDEFAULT VALUES%s"
 		}
 
 		var queryOutput, queryReturning string
 
 		if len(cache.retMapping) != 0 {
-			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `todos` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, todoPrimaryKeyColumns))
+			queryReturning = fmt.Sprintf(" RETURNING \"%s\"", strings.Join(returnColumns, "\",\""))
 		}
 
 		cache.query = fmt.Sprintf(cache.query, queryOutput, queryReturning)
@@ -759,44 +759,17 @@ func (o *Todo) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+
+	if len(cache.retMapping) != 0 {
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
+	} else {
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
+	}
 
 	if err != nil {
 		return errors.Wrap(err, "entity: unable to insert into todos")
 	}
 
-	var lastID int64
-	var identifierCols []interface{}
-
-	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = uint64(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == todoMapping["id"] {
-		goto CacheNoHooks
-	}
-
-	identifierCols = []interface{}{
-		o.ID,
-	}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, cache.retQuery)
-		fmt.Fprintln(writer, identifierCols...)
-	}
-	err = exec.QueryRowContext(ctx, cache.retQuery, identifierCols...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
-	if err != nil {
-		return errors.Wrap(err, "entity: unable to populate default values for todos")
-	}
-
-CacheNoHooks:
 	if !cached {
 		todoInsertCacheMut.Lock()
 		todoInsertCache[key] = cache
@@ -838,9 +811,9 @@ func (o *Todo) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 			return 0, errors.New("entity: unable to update todos, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE `todos` SET %s WHERE %s",
-			strmangle.SetParamNames("`", "`", 0, wl),
-			strmangle.WhereClause("`", "`", 0, todoPrimaryKeyColumns),
+		cache.query = fmt.Sprintf("UPDATE \"todos\" SET %s WHERE %s",
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, todoPrimaryKeyColumns),
 		)
 		cache.valueMapping, err = queries.BindMapping(todoType, todoMapping, append(wl, todoPrimaryKeyColumns...))
 		if err != nil {
@@ -919,9 +892,9 @@ func (o TodoSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE `todos` SET %s WHERE %s",
-		strmangle.SetParamNames("`", "`", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, todoPrimaryKeyColumns, len(o)))
+	sql := fmt.Sprintf("UPDATE \"todos\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, colNames),
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, todoPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -952,7 +925,7 @@ func (o *Todo) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, er
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), todoPrimaryKeyMapping)
-	sql := "DELETE FROM `todos` WHERE `id`=?"
+	sql := "DELETE FROM \"todos\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1017,8 +990,8 @@ func (o TodoSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (in
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM `todos` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, todoPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM \"todos\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, todoPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1072,8 +1045,8 @@ func (o *TodoSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT `todos`.* FROM `todos` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, todoPrimaryKeyColumns, len(*o))
+	sql := "SELECT \"todos\".* FROM \"todos\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, todoPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
@@ -1088,9 +1061,9 @@ func (o *TodoSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 }
 
 // TodoExists checks if the Todo row exists.
-func TodoExists(ctx context.Context, exec boil.ContextExecutor, iD uint64) (bool, error) {
+func TodoExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `todos` where `id`=? limit 1)"
+	sql := "select exists(select 1 from \"todos\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1107,13 +1080,9 @@ func TodoExists(ctx context.Context, exec boil.ContextExecutor, iD uint64) (bool
 	return exists, nil
 }
 
-var mySQLTodoUniqueColumns = []string{
-	"id",
-}
-
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) error {
+func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("entity: no todos provided for upsert")
 	}
@@ -1131,14 +1100,19 @@ func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColu
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(todoColumnsWithDefault, o)
-	nzUniques := queries.NonZeroDefaultSet(mySQLTodoUniqueColumns, o)
-
-	if len(nzUniques) == 0 {
-		return errors.New("cannot upsert with a table that cannot conflict on a unique column")
-	}
 
 	// Build cache key in-line uglily - mysql vs psql problems
 	buf := strmangle.GetBuffer()
+	if updateOnConflict {
+		buf.WriteByte('t')
+	} else {
+		buf.WriteByte('f')
+	}
+	buf.WriteByte('.')
+	for _, c := range conflictColumns {
+		buf.WriteString(c)
+	}
+	buf.WriteByte('.')
 	buf.WriteString(strconv.Itoa(updateColumns.Kind))
 	for _, c := range updateColumns.Cols {
 		buf.WriteString(c)
@@ -1150,10 +1124,6 @@ func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColu
 	}
 	buf.WriteByte('.')
 	for _, c := range nzDefaults {
-		buf.WriteString(c)
-	}
-	buf.WriteByte('.')
-	for _, c := range nzUniques {
 		buf.WriteString(c)
 	}
 	key := buf.String()
@@ -1177,17 +1147,16 @@ func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColu
 			todoPrimaryKeyColumns,
 		)
 
-		if !updateColumns.IsNone() && len(update) == 0 {
+		if updateOnConflict && len(update) == 0 {
 			return errors.New("entity: unable to upsert todos, could not build update column list")
 		}
 
-		ret = strmangle.SetComplement(ret, nzUniques)
-		cache.query = buildUpsertQueryMySQL(dialect, "`todos`", update, insert)
-		cache.retQuery = fmt.Sprintf(
-			"SELECT %s FROM `todos` WHERE %s",
-			strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, ret), ","),
-			strmangle.WhereClause("`", "`", 0, nzUniques),
-		)
+		conflict := conflictColumns
+		if len(conflict) == 0 {
+			conflict = make([]string, len(todoPrimaryKeyColumns))
+			copy(conflict, todoPrimaryKeyColumns)
+		}
+		cache.query = buildUpsertQueryPostgres(dialect, "\"todos\"", updateOnConflict, ret, update, conflict, insert)
 
 		cache.valueMapping, err = queries.BindMapping(todoType, todoMapping, insert)
 		if err != nil {
@@ -1213,47 +1182,18 @@ func (o *Todo) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColu
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
-
+	if len(cache.retMapping) != 0 {
+		err = exec.QueryRowContext(ctx, cache.query, vals...).Scan(returns...)
+		if err == sql.ErrNoRows {
+			err = nil // Postgres doesn't return anything when there's no update
+		}
+	} else {
+		_, err = exec.ExecContext(ctx, cache.query, vals...)
+	}
 	if err != nil {
-		return errors.Wrap(err, "entity: unable to upsert for todos")
+		return errors.Wrap(err, "entity: unable to upsert todos")
 	}
 
-	var lastID int64
-	var uniqueMap []uint64
-	var nzUniqueCols []interface{}
-
-	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = uint64(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == todoMapping["id"] {
-		goto CacheNoHooks
-	}
-
-	uniqueMap, err = queries.BindMapping(todoType, todoMapping, nzUniques)
-	if err != nil {
-		return errors.Wrap(err, "entity: unable to retrieve unique values for todos")
-	}
-	nzUniqueCols = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), uniqueMap)
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, cache.retQuery)
-		fmt.Fprintln(writer, nzUniqueCols...)
-	}
-	err = exec.QueryRowContext(ctx, cache.retQuery, nzUniqueCols...).Scan(returns...)
-	if err != nil {
-		return errors.Wrap(err, "entity: unable to populate default values for todos")
-	}
-
-CacheNoHooks:
 	if !cached {
 		todoUpsertCacheMut.Lock()
 		todoUpsertCache[key] = cache

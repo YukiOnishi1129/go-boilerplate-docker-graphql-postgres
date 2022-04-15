@@ -9,7 +9,7 @@ import (
 
 func NewUserFromModel(entity *entity.User) *model.User {
 	resUser := model.User{
-		ID:        strconv.FormatUint(entity.ID, 10),
+		ID:        strconv.FormatInt(entity.ID, 10),
 		Name:      entity.Name,
 		Email:     entity.Email,
 		CreatedAt: timeutil.TimeFormat(entity.CreatedAt),
